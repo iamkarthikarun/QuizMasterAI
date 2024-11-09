@@ -5,110 +5,41 @@ A question generation system that leverages a fine-tuned Llama model to create e
 ### Key Features
 
 - **OCR Processing**
-  - Took a stab at using Claude Haiku as an 
+  - Took a stab at using Claude Haiku as an OCR machine to replace powerful OCR-only apps like Textract. Feels more cost effective and the control that LLMs provide over Textract like apps is too good to ignore the OCR potential of LLMs.
 
-- **Advanced Text Processing**
-  - Semantic chunking using LangChain
-  - Optimized content segmentation
-  - Context-aware text processing
+- **Semantic Chunking**
+  - Tried to chunk with LLMs and also just with embeddings - cosine similarity to keep context in individual chunks. Easier way is to use recursive character text splitter or something similar but this has proven to be effective during retrieval when P@K where K>>>2 is required. 
 
 - **Hybrid Search Implementation**
-  - Vector-based semantic search using Qdrant
-  - Keyword-based search using BM25
-  - Cross-encoder reranking for result refinement
-  - BGE embeddings for text vectorization
+  - The usual standard these days - one sparse (BM25) and one dense (GTE). Also tried BM42 but Qdrant seems to have missed some key detes in their evaluation of their BM42 algo.
 
-- **Question Generation**
-  - Multiple Choice Questions (MCQs) with 4 options
-  - Descriptive questions testing higher-order thinking
-  - Context-aware response generation
-  - Real-time streaming responses
-
-### Business Impact
-
-The system addresses key challenges in educational assessment:
-- Reduces time spent on creating quality assessment materials
-- Ensures comprehensive coverage of educational content
-- Maintains consistency in question quality
-- Supports various difficulty levels and question types
+- **Context Aware and Streaming Responses**
+  - LangChain used here. Don't like using LangChain a lot due to the abstraction but proves useful for last mile delivery of LLM solutions imho.
 
 ### Technical Architecture
 
-The project implements a sophisticated pipeline:
+The project involved a healthy pipeline:
 
 1. **Data Processing Layer**
    - PDF text extraction and OCR
    - Semantic chunking and preprocessing
-   - Data cleaning and validation
 
-2. **Vector Storage Layer**
-   - Qdrant vector database integration
-   - Efficient embedding storage and retrieval
-   - Optimized vector search capabilities
+2. **Ingestion**
+   - Qdrant DB integration
+   - BM25 and GTE based embeddings
 
-3. **Search Layer**
-   - Hybrid search combining semantic and keyword approaches
-   - Result reranking for relevance
-   - Context-aware retrieval
+3. **Search**
+   - Hybrid search using both BM25 and Dense search
+   - Reranking with a cross-encoder
 
-4. **Generation Layer**
-   - Local LLM integration via LM-Studio
-   - Structured prompt engineering
-   - Stream-based response generation
+4. **Generation**
+   - Local LLM integration via LM-Studio (Deployed the Llama3 on local to serve an API with ease)
+   - Engineered prompts (of course !)
+   
 
-5. **Interface Layer**
+5. **Interface**
    - Streamlit-based chat interface
-   - Real-time response streaming
-   - Interactive user experience
-
-## Technical Implementation
-
-### Data Processing Pipeline
-
-The system implements a sophisticated pipeline for processing educational content:
-
-#### Text Extraction Layer
-- Asynchronous PDF processing using both traditional libraries and LLM-powered OCR
-- Claude API integration for enhanced text recognition
-- Robust retry mechanisms with exponential backoff
-- Parallel processing capabilities for multiple documents
-
-#### Content Processing
-- Semantic chunking using LangChain's Text Splitters
-- Context-aware content segmentation
-- Optimized chunk sizes for:
-  - Question generation relevance
-  - Search result accuracy
-  - Context retention
-
-### Search Architecture
-
-The system employs a hybrid search mechanism combining multiple approaches:
-
-#### Vector Search
-- Qdrant vector database for efficient similarity search
-- BGE embeddings for text vectorization
-- Optimized for educational content retrieval
-- Scalable vector storage and retrieval
-
-#### Keyword Search
-- BM25 algorithm implementation
-- Traditional keyword-based relevance scoring
-- Enhanced context understanding
-
-#### Result Refinement
-- Cross-encoder reranking
-- Relevance score thresholding
-- Context-aware result filtering
-
-### Question Generation System
-
-The core question generation engine utilizes:
-
-#### LLM Integration
-- Local LM-Studio deployment
-- Optimized prompt engineering
-- Context-aware response generation
+   - Streaming responses
 
 #### Question Types
 - Multiple Choice Questions (MCQs)
@@ -122,7 +53,7 @@ The core question generation engine utilizes:
 
 ### Dashboard Interface
 
-![QuizMasterAI Dashboard](results/dashboard.png)
+![QuizMasterAI Dashboard](screenshots/dashboard.png)
 
 The Streamlit-based dashboard provides:
 - Real-time question generation
@@ -130,7 +61,7 @@ The Streamlit-based dashboard provides:
 - Context-aware responses
 - Streaming response display
 
-*Note: The Jupyter notebooks in this repository are in their raw, unpolished form - because who has time to clean notebooks when the system works? 😅*
+*Note: The Jupyter notebooks in this repository are in their raw, unpolished form - because who has time to clean notebooks when the system works? I swear I would keep it as clean as a scalpel in an actual paid environment :disguised_face: :sunglasses:*
 
 ## Results and Performance
 
@@ -142,44 +73,21 @@ The Streamlit-based dashboard provides:
 - Average response time under 2 seconds
 
 #### Question Generation Quality
-- 95% grammatically correct questions
-- 87% contextually relevant questions
+- A mean score of 3.41 on the RQUGE scale (reference-free metric specific to question generation - https://arxiv.org/abs/2211.01482)
+- Manually compared it to SoTA models like GPT-3.5 and Gemini, very comparable on the relevancy, clarity and distribution scales
 - Balanced distribution of:
   - Multiple Choice Questions (MCQs)
   - Descriptive Questions
   - Difficulty Levels
 
-### System Screenshots
-
-![Question Generation Interface](results/chat_interface.png)
-*Main chat interface showing real-time question generation*
-
-![Sample Questions Generated](results/sample_questions.png)
-*Sample output showing MCQs and descriptive questions*
-
 ## Future Improvements
 
 ### Planned Enhancements
-- Integration with more LLM providers
+- A grader system (watch this space when I update that repo)
 - Enhanced question difficulty calibration
-- Support for multiple languages
-- Automated question quality assessment
-- Integration with Learning Management Systems (LMS)
 
 ### Known Limitations
-- Currently optimized for English language content
-- Limited to text-based educational materials
-- Requires specific formatting for optimal OCR results
-
-## Acknowledgments
-
-- LangChain for the comprehensive LLM toolkit
-- Qdrant team for the vector database
-- Claude API team for OCR capabilities
-- LM-Studio for local LLM deployment
-- BGE embedding model creators
-
-*Note: The Jupyter notebooks in this repository are like my college dorm room - functional but messy. They serve as development logs rather than clean documentation. PRs for cleanup are welcome! 😅*
+- Requires the exhaustive process of ingesting a PDF.
 
 ---
-*This project was developed as part of exploring the capabilities of LLMs in educational technology. For questions or collaborations, feel free to reach out!*
+*This project was developed as part of my official submission to the practice module for Practical Language Processing course at NUS. For questions or collaborations, feel free to reach out!*
