@@ -1,0 +1,9 @@
+streamlit
+transformers
+sentence_transformers
+openai
+langchain
+langchain-openai
+qdrant-client
+rank_bm25
+
